@@ -1,0 +1,84 @@
+<script src="js/dw_core.js" type="text/javascript"></script>
+<script src="js/dw_util.js" type="text/javascript"></script>
+<script src="js/dw_clip.js" type="text/javascript"></script>
+<script src="js/dw_wipes.js" type="text/javascript"></script>
+<script type="text/javascript">
+<!--
+/*
+This code is from Dynamic Web Coding
+www.dyn-web.com
+Copyright 2002 by Sharon Paine
+See Terms of Use at http://www.dyn-web.com/bus/terms.html
+Permission granted to use this code
+as long as this entire notice is included.
+*/
+var outerLyr, wipeLyr1;
+function initDynLyrs() {
+	// args: id,left,top,width,height
+	outerLyr = new dynObj('outerDiv',0,0,220,75);
+	wipeLyr1 = new dynObj('wipeDiv1',0,0,200);
+	
+	// eliminate incapable browsers
+	if (!outerLyr || !document.layers && typeof outerLyr.el.innerHTML == "undefined") return;
+	
+	// background color and border
+	outerLyr.setBgClr("#333366");
+	if (outerLyr.el.style) {	// ns4 can't
+		outerLyr.css.border = "2px outset #dee7f7"
+	}
+	
+	doWipes();
+}
+window.onload=initDynLyrs;
+// put your items here
+// content, wipe-in duration, effect for wipe-in, effect for wipe-out
+var wipe_array=new Array(
+     <{foreach item=pic from=$block.pics}>
+     '<a href="<{$xoops_url}>/modules/xcgal/<{$pic.link_tgt}>"><{$pic.image}><br /></a><{$pic.caption}>',1500,'in center','out center',
+     <{/foreach}>
+     '<a href="<{$xoops_url}>/modules/xcgal/<{$block.pics[1].link_tgt}>"><{$block.pics[1].image}><br /></a><{$block.pics[1].caption}>',1500,'in center','out center'
+
+     );
+
+var wipe_count=0;	// to keep track
+function doWipes() {
+	if (wipe_count<wipe_array.length) {
+	// in table so width/height of content can be obtained
+		var cntnt = '<table id="w1" width="'+wipeLyr1.width+'" border="0" cellpadding="0" cellspacing="0"><tr><td class="wipe">'+  wipe_array[wipe_count] +'</td></tr></table>';
+		
+		wipePrep(wipeLyr1,cntnt,'w1');
+		wipeLyr1.centerIn(outerLyr);
+		
+		// args: which wipe, delay, wipeTime, what next
+		wipeLyr1.wipe(wipe_array[wipe_count+2],1000, wipe_array[wipe_count+1],"wipeOuts()");
+  } else {
+		wipe_count=0;
+		doWipes();
+	}
+}
+
+// prepare for wipe in (called from doWipes fn)
+function wipePrep(obj,cntnt,id) {
+	obj.hide();
+	// restore, for ns4, or new content is visible...
+	obj.clipTo(0,obj.width,obj.height,0);	
+	obj.writeLyr(cntnt);
+	obj.width=getWidth(obj.el,id);
+	obj.height=getHeight(obj.el,id);
+}
+
+function wipeOuts() {
+	// controls speed of wipe out
+	// divide time allotted for item in wipe_array by this number
+	var dv = 4;
+	// args: which wipe, delay, wipeTime, what next
+	wipeLyr1.wipe(wipe_array[wipe_count+3], 2000, wipe_array[wipe_count+1]/dv,"doWipes()");
+	wipe_count+=4;
+}
+
+//-->
+</script>
+<div id="outerDiv">
+  <div id="wipeDiv1"></div>
+</div>
+
